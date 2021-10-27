@@ -1,0 +1,89 @@
+version: '3.3'
+
+services:
+
+  traefik:
+    image: traefik:latest
+    restart: always
+    container_name: "traefik"
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+      # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.myresolver.acme.email=bandi@qodex.cc"
+      - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+
+    networks:
+      - web
+      - internal
+    ports:
+      - 80:80
+      - 443:443
+      - 8080:8080
+    volumes:
+      - "./letsencrypt:/letsencrypt"
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  nc_db:
+    image: mariadb
+    restart: always
+    container_name: "nextcloud-db"
+    volumes:
+      - nc_db:/var/lib/mysql
+    env_file:
+      - nc_secrets.env
+    labels:
+      - "traefik.enable=false"
+    networks:
+      - internal
+
+  nextcloud:
+    image: nextcloud
+    restart: always
+    container_name: "nextcloud-app"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud.tls=true"
+      - "traefik.http.routers.nextcloud.rule=Host(`nc.qodex.org`)"
+      - "traefik.http.routers.nextcloud.tls.certresolver=myresolver"
+    links:
+      - nc_db
+    volumes:
+      - nextcloud:/var/www/html
+      - ./storage.config.php:/var/www/html/config/storage.config.php
+    env_file:
+      - nc_secrets.env
+    networks:
+      - web
+      - internal
+
+  nginx:
+    image: nginx
+    restart: always
+    container_name: "website"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.website.tls=true"
+      - "traefik.http.routers.website.rule=Host(`qodex.org`)"
+      - "traefik.http.routers.website.tls.certresolver=myresolver"
+    volumes:
+      - ./website:/var/www/html
+    networks:
+      - web
+      - internal
+
+volumes:
+  nextcloud:
+  nc_db:
+
+networks:
+  internal:
+    external: false
+  web:
+    external: true
