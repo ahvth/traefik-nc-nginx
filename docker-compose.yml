@@ -55,7 +55,6 @@ services:
     links:
       - nc_db
     volumes:
-      - ./storage.config.php:/var/www/html/config/storage.config.php
       - nextcloud:/var/www/html
     env_file:
       - nc_secrets.env
