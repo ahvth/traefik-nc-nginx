@@ -32,6 +32,7 @@ services:
 
   nc_db:
     image: mariadb
+    command: --transaction-isolation=READ-COMMITTED --binlog-format=ROW --innodb-file-per-table=1 --skip-innodb-read-only-compressed
     restart: always
     container_name: "nextcloud-db"
     volumes:
@@ -77,7 +78,6 @@ services:
       - web      
 
 volumes:
-  nextcloud:
   nc_db:
 
 networks:
