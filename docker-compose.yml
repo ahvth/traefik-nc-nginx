@@ -16,7 +16,7 @@ services:
       - "--entrypoints.websecure.address=:443"
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       # - "--certificatesresolvers.myresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
-      - "--certificatesresolvers.myresolver.acme.email=bandi@qodex.cc"
+      - "--certificatesresolvers.myresolver.acme.email=<WEBMASTER EMAIL>"
       - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
 
     networks:
@@ -51,7 +51,7 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.nextcloud.tls=true"
-      - "traefik.http.routers.nextcloud.rule=Host(`nc.qodex.org`)"
+      - "traefik.http.routers.nextcloud.rule=Host(`<NEXTCLOUD DOMAIN>`)"
       - "traefik.http.routers.nextcloud.tls.certresolver=myresolver"
     links:
       - nc_db
@@ -70,10 +70,10 @@ services:
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.website.tls=true"
-      - "traefik.http.routers.website.rule=Host(`qodex.org`)"
+      - "traefik.http.routers.website.rule=Host(`<STATIC WEBSITE DOMAIN>`)"
       - "traefik.http.routers.website.tls.certresolver=myresolver"
     volumes:
-      - ./website:/var/www/html
+      - ./website:/usr/share/nginx/html
     networks:
       - web      
 
