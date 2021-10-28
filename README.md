@@ -2,7 +2,7 @@
 
 This docker-compose file will deploy traefik, nextcloud and nginx onto a web server. nginx will by default serve a static website that should be deployed in the `website` folder.
 
-The examples folder includes templates for the necessary nc_secrets.env file and also a template for configuring nextcloud to use S3-compatible object storage (see instructions below for more information).
+The main folder includes templates for the necessary nc_secrets.env file and also a template for configuring nextcloud to use S3-compatible object storage (see instructions below for more information).
 
 ## Dependencies
 
