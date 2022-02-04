@@ -60,7 +60,6 @@ services:
     env_file:
       - nc_secrets.env
     networks:
-      - web
       - internal
 
   nginx:
@@ -75,7 +74,16 @@ services:
     volumes:
       - ./website:/usr/share/nginx/html
     networks:
-      - web      
+      - internal   
+  
+  smtp:
+    image: bytemark/smtp
+    restart: always
+    container_name: "smtp"
+    networks:
+      - web 
+      - internal
+
 
 volumes:
   nc_db:
